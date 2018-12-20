@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!--
+  Gazebo HRIM joint state publisher plugin demo
+-->
+<sdf version="1.6">
+  <world name="default">
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <include>
+      <uri>model://double_pendulum_with_base</uri>
+
+      <plugin name="gazebo_hrim_joint_state_publisher"
+          filename="libgazebo_hrim_joint_state_publisher.so">
+        <ros>
+          <namespace>/demo</namespace>
+          <argument>joint_states:=joint_states_demo</argument>
+        </ros>
+        <update_rate>2</update_rate>
+        <joint_name>upper_joint</joint_name>
+        <joint_name>lower_joint</joint_name>
+      </plugin>
+
+    </include>
+  </world>
+</sdf>

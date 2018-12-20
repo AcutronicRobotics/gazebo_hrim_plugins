@@ -17,6 +17,7 @@ find_package(gazebo_ros REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(hrim_sensor_camera_msgs REQUIRED)
+find_package(hrim_composite_arm_msgs REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
@@ -25,10 +26,23 @@ include_directories(include
   ${gazebo_dev_INCLUDE_DIRS}
   ${gazebo_ros_INCLUDE_DIRS}
   ${hrim_sensor_camera_msgs_INCLUDE_DIRS}
+  ${hrim_composite_arm_msgs_INCLUDE_DIRS}
   ${tf2_ros_INCLUDE_DIRS}
   ${tf2_INCLUDE_DIRS}
 )
 link_directories(${gazebo_dev_LIBRARY_DIRS})
+
+# gazebo_hrim_joint_state_publisher
+add_library(gazebo_hrim_joint_state_publisher SHARED
+  src/gazebo_hrim_joint_state_publisher.cpp
+)
+ament_target_dependencies(gazebo_hrim_joint_state_publisher
+  "gazebo_dev"
+  "gazebo_ros"
+  "rclcpp"
+  "hrim_composite_arm_msgs"
+)
+ament_export_libraries(gazebo_hrim_joint_state_publisher)
 
 # gazebo_ros_camera
 add_library(gazebo_hrim_camera SHARED
@@ -60,6 +74,7 @@ install(DIRECTORY include/
 
 install(TARGETS
     gazebo_hrim_camera
+    gazebo_hrim_joint_state_publisher
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin)
