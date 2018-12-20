@@ -18,7 +18,6 @@
 #include <ignition/math/Helpers.hh>
 
 #include <gazebo_hrim_plugins/gazebo_hrim_camera.hpp>
-#include <gazebo_ros/conversions/builtin_interfaces.hpp>
 #include <gazebo_ros/node.hpp>
 #include <gazebo_ros/utils.hpp>
 #include <image_transport/image_transport.h>
@@ -208,7 +207,8 @@ void GazeboRosCamera::OnNewFrame(
   // Publish image
   hrim_sensor_camera_msgs::msg::Image image_msg;
   image_msg.header.frame_id = impl_->frame_name_;
-  image_msg.header.stamp = gazebo_ros::Convert<builtin_interfaces::msg::Time>(sensor_update_time);
+  image_msg.header.stamp.sec = int(sensor_update_time.sec);
+  image_msg.header.stamp.nanosec = uint(sensor_update_time.nsec);
 
   image_msg.encoding = impl_->type_;
   image_msg.height = _height;
@@ -256,8 +256,8 @@ void GazeboRosCamera::OnNewFrame(
   camera_info_msg.d.resize(5);
 
   // Publish camera info
-  camera_info_msg.header.stamp = gazebo_ros::Convert<builtin_interfaces::msg::Time>(
-    sensor_update_time);
+  camera_info_msg.header.stamp.sec = int(sensor_update_time.sec);
+  camera_info_msg.header.stamp.nanosec = uint(sensor_update_time.nsec);
 
   // Allow the user to disable automatic cropping (used to remove barrel
   // distortion black border. The crop can be useful, but also skewes
