@@ -13,14 +13,10 @@
 // limitations under the License.
 
 
-#include <builtin_interfaces/msg/time.hpp>
 #include <gazebo_hrim_plugins/gazebo_hrim_imu_sensor.hpp>
-#include <gazebo_ros/conversions/builtin_interfaces.hpp>
-#include <gazebo_ros/conversions/geometry_msgs.hpp>
 #include <gazebo_ros/node.hpp>
 #include <gazebo_ros/utils.hpp>
-#include <geometry_msgs/msg/quaternion.hpp>
-#include <sensor_msgs/msg/imu.hpp>
+#include <hrim_sensor_imu_msgs/msg/imu.hpp>
 
 #include <iostream>
 #include <memory>
@@ -35,9 +31,9 @@ public:
   /// Node for ros communication
   gazebo_ros::Node::SharedPtr ros_node_;
   /// Publish for imu message
-  rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr pub_;
+  rclcpp::Publisher<hrim_sensor_imu_msgs::msg::IMU>::SharedPtr pub_;
   /// IMU message modified each update
-  sensor_msgs::msg::Imu::SharedPtr msg_;
+  hrim_sensor_imu_msgs::msg::IMU::SharedPtr msg_;
   /// IMU sensor this plugin is attached to
   gazebo::sensors::ImuSensorPtr sensor_;
   /// Event triggered when sensor updates
@@ -66,10 +62,10 @@ void GazeboRosImuSensor::Load(gazebo::sensors::SensorPtr _sensor, sdf::ElementPt
     return;
   }
 
-  impl_->pub_ = impl_->ros_node_->create_publisher<sensor_msgs::msg::Imu>("~/out");
+  impl_->pub_ = impl_->ros_node_->create_publisher<hrim_sensor_imu_msgs::msg::IMU>("~/out");
 
   // Create message to be reused
-  auto msg = std::make_shared<sensor_msgs::msg::Imu>();
+  auto msg = std::make_shared<hrim_sensor_imu_msgs::msg::IMU>();
 
   // Get frame for message
   msg->header.frame_id = gazebo_ros::SensorFrameID(*_sensor, *_sdf);
@@ -98,15 +94,27 @@ void GazeboRosImuSensor::Load(gazebo::sensors::SensorPtr _sensor, sdf::ElementPt
 
 void GazeboRosImuSensorPrivate::OnUpdate()
 {
+  auto current_time = sensor_->LastUpdateTime();
+  auto current_orientation = sensor_->Orientation();
+  auto current_velocity = sensor_->AngularVelocity();
+  auto current_acceleration = sensor_->LinearAcceleration();
+
   // Fill message with latest sensor data
-  msg_->header.stamp = gazebo_ros::Convert<builtin_interfaces::msg::Time>(
-    sensor_->LastUpdateTime());
-  msg_->orientation =
-    gazebo_ros::Convert<geometry_msgs::msg::Quaternion>(sensor_->Orientation());
-  msg_->angular_velocity = gazebo_ros::Convert<geometry_msgs::msg::Vector3>(
-    sensor_->AngularVelocity());
-  msg_->linear_acceleration = gazebo_ros::Convert<geometry_msgs::msg::Vector3>(
-    sensor_->LinearAcceleration());
+  msg_->header.stamp.sec = int(current_time.sec);
+  msg_->header.stamp.nanosec = uint(current_time.nsec);
+
+  msg_->orientation.x = current_orientation.X();
+  msg_->orientation.y = current_orientation.Y();
+  msg_->orientation.z = current_orientation.Z();
+  msg_->orientation.w = current_orientation.W();
+
+  msg_->angular_velocity.x = current_velocity.X();
+  msg_->angular_velocity.y = current_velocity.Y();
+  msg_->angular_velocity.z = current_velocity.Z();
+
+  msg_->linear_acceleration.x = current_velocity.X();
+  msg_->linear_acceleration.y = current_velocity.Y();
+  msg_->linear_acceleration.z = current_velocity.Z();
 
   // Publish message
   pub_->publish(msg_);
