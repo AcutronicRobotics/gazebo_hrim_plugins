@@ -35,8 +35,8 @@
 #include <gazebo/physics/Joint.hh>
 #include <gazebo/physics/Model.hh>
 #include <gazebo/physics/World.hh>
-#include <gazebo_plugins/gazebo_ros_joint_state_publisher.hpp>
 #include <gazebo_ros/conversions/builtin_interfaces.hpp>
+#include <gazebo_hrim_plugins/gazebo_hrim_joint_state_publisher.hpp>
 #include <gazebo_ros/node.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <hrim_composite_arm_msgs/msg/joint_states.hpp>
@@ -45,7 +45,7 @@
 #include <string>
 #include <vector>
 
-namespace gazebo_plugins
+namespace gazebo_hrim_plugins
 {
 class GazeboRosJointStatePublisherPrivate
 {
