@@ -15,6 +15,7 @@ find_package(ament_cmake REQUIRED)
 find_package(gazebo_dev REQUIRED)
 find_package(gazebo_ros REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(sensor_msgs REQUIRED)
 find_package(hrim_sensor_camera_msgs REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
@@ -38,6 +39,7 @@ ament_target_dependencies(gazebo_hrim_camera
   "gazebo_ros"
   "image_transport"
   "rclcpp"
+  "sensor_msgs"
   "hrim_sensor_camera_msgs"
   "std_msgs"
 )
