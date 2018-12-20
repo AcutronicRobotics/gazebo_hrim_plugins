@@ -62,6 +62,17 @@ target_link_libraries(gazebo_hrim_camera
 )
 ament_export_libraries(gazebo_hrim_camera)
 
+# gazebo_hrim_imu_sensor
+add_library(gazebo_hrim_imu_sensor SHARED
+  src/gazebo_hrim_imu_sensor.cpp
+)
+ament_target_dependencies(gazebo_hrim_imu_sensor
+  "gazebo_ros"
+  "sensor_msgs"
+  "gazebo_dev"
+)
+ament_export_libraries(gazebo_hrim_imu_sensor)
+
 ament_export_include_directories(include)
 ament_export_dependencies(rclcpp)
 ament_export_dependencies(gazebo_dev)
@@ -74,6 +85,7 @@ install(DIRECTORY include/
 
 install(TARGETS
     gazebo_hrim_camera
+    gazebo_hrim_imu_sensor
     gazebo_hrim_joint_state_publisher
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
