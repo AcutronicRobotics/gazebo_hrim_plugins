@@ -35,7 +35,6 @@
 #include <gazebo/physics/Joint.hh>
 #include <gazebo/physics/Model.hh>
 #include <gazebo/physics/World.hh>
-#include <gazebo_ros/conversions/builtin_interfaces.hpp>
 #include <gazebo_hrim_plugins/gazebo_hrim_joint_state_publisher.hpp>
 #include <gazebo_ros/node.hpp>
 #include <rclcpp/rclcpp.hpp>
@@ -162,7 +161,8 @@ void GazeboRosJointStatePublisherPrivate::OnUpdate(const gazebo::common::UpdateI
   // Populate message
   hrim_composite_arm_msgs::msg::JointStates joint_state;
 
-  joint_state.header.stamp = gazebo_ros::Convert<builtin_interfaces::msg::Time>(current_time);
+  joint_state.header.stamp.sec = int(current_time.sec);
+  joint_state.header.stamp.nanosec = uint(current_time.nsec);
   joint_state.joint_names.resize(joints_.size());
   joint_state.position.resize(joints_.size());
   joint_state.velocity.resize(joints_.size());
