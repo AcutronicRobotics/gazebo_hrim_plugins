@@ -113,8 +113,8 @@ void GazeboRosRaySensorPrivate::OnUpdate()
     range_msg_->time_measurements = laser_msg_->time_increment = (prev_meas_ - last_measure_time_).seconds();
     laser_msg_->time_scan = (prev_upd_ - last_update_time_).seconds();
 
-    laser_msg_->angle_start = sensor_->AngleMin().Degree();
-    laser_msg_->angle_end = sensor_->AngleMax().Degree();
+    laser_msg_->angle_start = sensor_->AngleMin().Radian();
+    laser_msg_->angle_end = sensor_->AngleMax().Radian();
     laser_msg_->angle_increment = sensor_->AngleResolution();
     range_specs_msg_->min_range = range_msg_->range_min = laser_msg_->range_min = sensor_->RangeMin();
     range_specs_msg_->max_range = range_msg_->range_max = laser_msg_->range_max = sensor_->RangeMax();
@@ -137,8 +137,11 @@ void GazeboRosRaySensorPrivate::OnUpdate()
     range_msg_->distance = tmpRange;
 
     range_specs_msg_->radiation_type = range_radiation_type_;
-    range_specs_msg_->field_of_view = (sensor_->AngleMax() - sensor_->AngleMin()).Degree();
     range_specs_msg_->accuracy = sensor_->RangeResolution();
+
+    auto horizontal_fov = sensor_->AngleMax() - sensor_->AngleMin();
+    auto vertical_fov = sensor_->VerticalAngleMax() - sensor_->VerticalAngleMin();
+    range_specs_msg_->field_of_view = std::max(horizontal_fov, vertical_fov).Radian();
 
     laser_pub_->publish(laser_msg_);
     range_specs_pub_->publish(range_specs_msg_);
