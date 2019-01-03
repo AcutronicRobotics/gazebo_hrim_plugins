@@ -52,6 +52,7 @@
               <argument>~/outlaser:=laser_scan</argument>
               <argument>~/outspecs:=specs</argument>
               <argument>~/outrange:=distance</argument>
+              <argument>~/outcloud:=pointcloud</argument>
             </ros>
           </plugin>
         </sensor>
