@@ -20,6 +20,7 @@ find_package(hrim_sensor_camera_msgs REQUIRED)
 find_package(hrim_sensor_imu_msgs REQUIRED)
 find_package(hrim_sensor_lidar_msgs REQUIRED)
 find_package(hrim_sensor_rangefinder_msgs REQUIRED)
+find_package(hrim_sensor_3dcameratof_msgs REQUIRED)
 find_package(hrim_composite_arm_msgs REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
@@ -32,6 +33,7 @@ include_directories(include
   ${hrim_sensor_imu_msgs_INCLUDE_DIRS}
   ${hrim_sensor_lidar_msgs_INCLUDE_DIRS}
   ${hrim_sensor_rangefinder_msgs_INCLUDE_DIRS}
+  ${hrim_sensor_3dcameratof_msgs_INCLUDE_DIRS}
   ${hrim_composite_arm_msgs_INCLUDE_DIRS}
   ${tf2_ros_INCLUDE_DIRS}
   ${tf2_INCLUDE_DIRS}
@@ -85,8 +87,10 @@ add_library(gazebo_hrim_ray_sensor SHARED
 )
 ament_target_dependencies(gazebo_hrim_ray_sensor
   "gazebo_ros"
+  "sensor_msgs"
   "hrim_sensor_lidar_msgs"
   "hrim_sensor_rangefinder_msgs"
+  "hrim_sensor_3dcameratof_msgs"
   "gazebo_dev"
 )
 ament_export_libraries(gazebo_hrim_ray_sensor)

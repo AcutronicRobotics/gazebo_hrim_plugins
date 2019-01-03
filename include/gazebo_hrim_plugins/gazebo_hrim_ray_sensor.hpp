@@ -20,6 +20,8 @@
 #include <hrim_sensor_lidar_msgs/msg/lidar_scan.hpp>
 #include <hrim_sensor_rangefinder_msgs/msg/distance.hpp>
 #include <hrim_sensor_rangefinder_msgs/msg/specs_rangefinder.hpp>
+#include <hrim_sensor_3dcameratof_msgs/msg/point_field.hpp>
+#include <hrim_sensor_3dcameratof_msgs/msg/point_cloud.hpp>
 
 #include <memory>
 
