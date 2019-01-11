@@ -31,7 +31,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 /*
- * \file  gazebo_ros_diff_drive.cpp
+ * \file  gazebo_hrim_diff_drive.cpp
  *
  * \brief A differential drive plugin for gazebo. Based on the diffdrive plugin
  * developed for the erratic robot (see copyright notice above). The original
@@ -55,12 +55,12 @@
 #include <gazebo/physics/Link.hh>
 #include <gazebo/physics/Model.hh>
 #include <gazebo/physics/World.hh>
-#include <gazebo_plugins/gazebo_ros_diff_drive.hpp>
+#include <gazebo_hrim_plugins/gazebo_hrim_diff_drive.hpp>
 #include <gazebo_ros/conversions/builtin_interfaces.hpp>
 #include <gazebo_ros/conversions/geometry_msgs.hpp>
 #include <gazebo_ros/node.hpp>
 #include <geometry_msgs/msg/pose2_d.hpp>
-#include <geometry_msgs/msg/twist.hpp>
+#include <hrim_composite_mobilebase_msgs/msg/goal_mobile_base.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 #include <sdf/sdf.hh>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
@@ -71,7 +71,7 @@
 #include <string>
 #include <vector>
 
-namespace gazebo_plugins
+namespace gazebo_hrim_plugins
 {
 class GazeboRosDiffDrivePrivate
 {
@@ -101,8 +101,8 @@ public:
   void OnUpdate(const gazebo::common::UpdateInfo & _info);
 
   /// Callback when a velocity command is received.
-  /// \param[in] _msg Twist command message.
-  void OnCmdVel(const geometry_msgs::msg::Twist::SharedPtr _msg);
+  /// \param[in] _msg GoalMobileBase command message.
+  void OnCmdVel(const hrim_composite_mobilebase_msgs::msg::GoalMobileBase::SharedPtr _msg);
 
   /// Update wheel velocities according to latest target velocities.
   void UpdateWheelVelocities();
@@ -130,7 +130,7 @@ public:
   gazebo_ros::Node::SharedPtr ros_node_;
 
   /// Subscriber to command velocities
-  rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr cmd_vel_sub_;
+  rclcpp::Subscription<hrim_composite_mobilebase_msgs::msg::GoalMobileBase>::SharedPtr cmd_vel_sub_;
 
   /// Odometry publisher
   rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odometry_pub_;
@@ -270,7 +270,7 @@ void GazeboRosDiffDrive::Load(gazebo::physics::ModelPtr _model, sdf::ElementPtr 
 
   rmw_qos_profile_t qos_profile = rmw_qos_profile_default;
   qos_profile.depth = 1;
-  impl_->cmd_vel_sub_ = impl_->ros_node_->create_subscription<geometry_msgs::msg::Twist>(
+  impl_->cmd_vel_sub_ = impl_->ros_node_->create_subscription<hrim_composite_mobilebase_msgs::msg::GoalMobileBase>(
     "cmd_vel", std::bind(&GazeboRosDiffDrivePrivate::OnCmdVel, impl_.get(),
     std::placeholders::_1),
     qos_profile);
@@ -416,11 +416,12 @@ void GazeboRosDiffDrivePrivate::UpdateWheelVelocities()
   desired_wheel_speed_[RIGHT] = vr + va * wheel_separation_ / 2.0;
 }
 
-void GazeboRosDiffDrivePrivate::OnCmdVel(const geometry_msgs::msg::Twist::SharedPtr _msg)
+void GazeboRosDiffDrivePrivate::OnCmdVel(const hrim_composite_mobilebase_msgs::msg::GoalMobileBase::SharedPtr _msg)
 {
   std::lock_guard<std::mutex> scoped_lock(lock_);
-  target_x_ = _msg->linear.x;
-  target_rot_ = _msg->angular.z;
+  target_x_ = _msg->velocity;
+  // Switch incoming angular velocity direction
+  target_rot_ = -_msg->direction_angle;
 }
 
 void GazeboRosDiffDrivePrivate::UpdateOdometryEncoder(const gazebo::common::Time & _current_time)
@@ -534,4 +535,4 @@ void GazeboRosDiffDrivePrivate::PublishOdometryMsg(const gazebo::common::Time & 
   odometry_pub_->publish(odom_);
 }
 GZ_REGISTER_MODEL_PLUGIN(GazeboRosDiffDrive)
-}  // namespace gazebo_plugins
+}  // namespace gazebo_hrim_plugins

@@ -4,9 +4,9 @@
 
   Try sending commands:
 
-    ros2 topic pub /demo/cmd_demo geometry_msgs/Twist '{linear: {x: 1.0}}' -1
+    ros2 topic pub /demo/cmd_demo hrim_composite_mobilebase_msgs/GoalMobileBase '{velocity: 1.0}' -1
 
-    ros2 topic pub /demo/cmd_demo geometry_msgs/Twist '{angular: {z: 0.1}}' -1
+    ros2 topic pub /demo/cmd_demo hrim_composite_mobilebase_msgs/GoalMobileBase '{direction_angle: 0.1}' -1
 
   Try listening to odometry:
 
@@ -14,7 +14,7 @@
 
   Try listening to TF:
 
-    ros2 run tf2_ros tf2_echo odom chassis
+    ros2 run tf2_ros tf2_echo odom_demo chassis
 
     ros2 run tf2_ros tf2_echo chassis right_wheel
 
@@ -219,7 +219,7 @@
         <child>caster</child>
       </joint>
 
-      <plugin name='diff_drive' filename='libgazebo_ros_diff_drive.so'>
+      <plugin name='gazebo_hrim_diff_drive' filename='libgazebo_hrim_diff_drive.so'>
 
         <ros>
           <namespace>/demo</namespace>

@@ -16,12 +16,14 @@ find_package(gazebo_dev REQUIRED)
 find_package(gazebo_ros REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(nav_msgs REQUIRED)
 find_package(hrim_sensor_camera_msgs REQUIRED)
 find_package(hrim_sensor_imu_msgs REQUIRED)
 find_package(hrim_sensor_lidar_msgs REQUIRED)
 find_package(hrim_sensor_rangefinder_msgs REQUIRED)
 find_package(hrim_sensor_3dcameratof_msgs REQUIRED)
 find_package(hrim_composite_arm_msgs REQUIRED)
+find_package(hrim_composite_mobilebase_msgs REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
@@ -29,12 +31,14 @@ find_package(tf2_ros REQUIRED)
 include_directories(include
   ${gazebo_dev_INCLUDE_DIRS}
   ${gazebo_ros_INCLUDE_DIRS}
+  ${nav_msgs_INCLUDE_DIRS}
   ${hrim_sensor_camera_msgs_INCLUDE_DIRS}
   ${hrim_sensor_imu_msgs_INCLUDE_DIRS}
   ${hrim_sensor_lidar_msgs_INCLUDE_DIRS}
   ${hrim_sensor_rangefinder_msgs_INCLUDE_DIRS}
   ${hrim_sensor_3dcameratof_msgs_INCLUDE_DIRS}
   ${hrim_composite_arm_msgs_INCLUDE_DIRS}
+  ${hrim_composite_mobilebase_msgs_INCLUDE_DIRS}
   ${tf2_ros_INCLUDE_DIRS}
   ${tf2_INCLUDE_DIRS}
 )
@@ -95,6 +99,23 @@ ament_target_dependencies(gazebo_hrim_ray_sensor
 )
 ament_export_libraries(gazebo_hrim_ray_sensor)
 
+# gazebo_hrim_diff_drive
+add_library(gazebo_hrim_diff_drive SHARED
+  src/gazebo_hrim_diff_drive.cpp
+)
+ament_target_dependencies(gazebo_hrim_diff_drive
+  "gazebo_dev"
+  "gazebo_ros"
+  "geometry_msgs"
+  "hrim_composite_mobilebase_msgs"
+  "nav_msgs"
+  "rclcpp"
+  "tf2"
+  "tf2_geometry_msgs"
+  "tf2_ros"
+)
+ament_export_libraries(gazebo_hrim_diff_drive)
+
 ament_export_include_directories(include)
 ament_export_dependencies(rclcpp)
 ament_export_dependencies(gazebo_dev)
@@ -110,6 +131,7 @@ install(TARGETS
     gazebo_hrim_imu_sensor
     gazebo_hrim_ray_sensor
     gazebo_hrim_joint_state_publisher
+    gazebo_hrim_diff_drive
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin)

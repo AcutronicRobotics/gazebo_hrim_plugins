@@ -30,14 +30,14 @@
 // ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef GAZEBO_PLUGINS__GAZEBO_ROS_DIFF_DRIVE_HPP_
-#define GAZEBO_PLUGINS__GAZEBO_ROS_DIFF_DRIVE_HPP_
+#ifndef GAZEBO_HRIM_PLUGINS__GAZEBO_ROS_DIFF_DRIVE_HPP_
+#define GAZEBO_HRIM_PLUGINS__GAZEBO_ROS_DIFF_DRIVE_HPP_
 
 #include <gazebo/common/Plugin.hh>
 
 #include <memory>
 
-namespace gazebo_plugins
+namespace gazebo_hrim_plugins
 {
 class GazeboRosDiffDrivePrivate;
 
@@ -53,17 +53,13 @@ class GazeboRosDiffDrivePrivate;
 /**
   Example Usage:
   \code{.xml}
-    <plugin name="gazebo_ros_diff_drive" filename="libgazebo_ros_diff_drive.so">
+    <plugin name='diff_drive' filename='libgazebo_hrim_diff_drive.so'>
 
       <ros>
-
-        <!-- Add a namespace -->
-        <namespace>/test</namespace>
-
+        <namespace>/demo</namespace>
+        <argument>cmd_vel:=cmd_demo</argument>
+        <argument>odom:=odom_demo</argument>
       </ros>
-
-      <!-- Update rate in Hz -->
-      <update_rate>50</update_rate>
 
       <!-- wheels -->
       <left_joint>left_wheel_joint</left_joint>
@@ -77,16 +73,12 @@ class GazeboRosDiffDrivePrivate;
       <max_wheel_torque>20</max_wheel_torque>
       <max_wheel_acceleration>1.0</max_wheel_acceleration>
 
-      <!-- input -->
-      <command_topic>cmd_vel</command_topic>
-
       <!-- output -->
       <publish_odom>true</publish_odom>
       <publish_odom_tf>true</publish_odom_tf>
       <publish_wheel_tf>true</publish_wheel_tf>
 
-      <odometry_topic>odom</odometry_topic>
-      <odometry_frame>odom</odometry_frame>
+      <odometry_frame>odom_demo</odometry_frame>
       <robot_base_frame>chassis</robot_base_frame>
 
     </plugin>
@@ -112,6 +104,6 @@ private:
   /// Private data pointer
   std::unique_ptr<GazeboRosDiffDrivePrivate> impl_;
 };
-}  // namespace gazebo_plugins
+}  // namespace gazebo_hrim_plugins
 
-#endif  // GAZEBO_PLUGINS__GAZEBO_ROS_DIFF_DRIVE_HPP_
+#endif  // GAZEBO_HRIM_PLUGINS__GAZEBO_ROS_DIFF_DRIVE_HPP_
