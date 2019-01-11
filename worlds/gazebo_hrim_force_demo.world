@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <!--
-  Gazebo ROS force plugin demo
+  Gazebo HRIM force plugin demo
 
   Try for example:
 
-  ros2 topic pub -1 /demo/force_demo geometry_msgs/Wrench "force: {x: 10.0}"
+  ros2 topic pub -1 /demo/force_demo hrim_geometry_msgs/Wrench "force: {x: 10.0}"
 -->
 <sdf version="1.6">
   <world name="default">

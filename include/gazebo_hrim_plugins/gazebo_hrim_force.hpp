@@ -31,7 +31,7 @@ class GazeboRosForcePrivate;
 
   Example Usage:
   \code{.xml}
-    <plugin name="gazebo_ros_force" filename="libgazebo_ros_force.so">
+    <plugin name="gazebo_hrim_force" filename="libgazebo_hrim_force.so">
 
       <ros>
 
@@ -39,7 +39,7 @@ class GazeboRosForcePrivate;
         <namespace>/test</namespace>
 
         <!-- Remap the default topic -->
-        <argument>gazebo_ros_force:=force_test</argument>
+        <argument>gazebo_hrim_force:=force_test</argument>
 
       </ros>
 

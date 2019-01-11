@@ -16,7 +16,6 @@
 #include <gazebo/physics/Link.hh>
 #include <gazebo/physics/Model.hh>
 #include <gazebo_hrim_plugins/gazebo_hrim_force.hpp>
-#include <gazebo_ros/conversions/geometry_msgs.hpp>
 #include <gazebo_ros/node.hpp>
 #include <hrim_geometry_msgs/msg/wrench.hpp>
 #include <rclcpp/rclcpp.hpp>
@@ -96,9 +95,7 @@ void GazeboRosForce::OnRosWrenchMsg(const hrim_geometry_msgs::msg::Wrench::Share
 
 void GazeboRosForce::OnUpdate()
 {
-  // impl_->link_->AddForce(gazebo_ros::Convert<ignition::math::Vector3d>(impl_->wrench_msg_.force));
   impl_->link_->AddForce(ignition::math::Vector3d(impl_->wrench_msg_.force.x, impl_->wrench_msg_.force.y, impl_->wrench_msg_.force.z));
-  // impl_->link_->AddTorque(gazebo_ros::Convert<ignition::math::Vector3d>(impl_->wrench_msg_.torque));
   impl_->link_->AddTorque(ignition::math::Vector3d(impl_->wrench_msg_.torque.x, impl_->wrench_msg_.torque.y, impl_->wrench_msg_.torque.z));
 }
 
