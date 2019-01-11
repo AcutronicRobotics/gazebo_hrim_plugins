@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef GAZEBO_PLUGINS__GAZEBO_ROS_FORCE_HPP_
-#define GAZEBO_PLUGINS__GAZEBO_ROS_FORCE_HPP_
+#ifndef GAZEBO_HRIM_PLUGINS__GAZEBO_ROS_FORCE_HPP_
+#define GAZEBO_HRIM_PLUGINS__GAZEBO_ROS_FORCE_HPP_
 
 #include <gazebo/common/Plugin.hh>
-#include <geometry_msgs/msg/wrench.hpp>
+#include <hrim_geometry_msgs/msg/wrench.hpp>
 
 #include <memory>
 
-namespace gazebo_plugins
+namespace gazebo_hrim_plugins
 {
 class GazeboRosForcePrivate;
 
@@ -67,14 +67,14 @@ protected:
   virtual void OnUpdate();
 
 private:
-  /// Callback when a ROS Wrench message is received
+  /// Callback when an HRIM Wrench message is received
   /// \param[in] msg The Incoming ROS message representing the new force to
   /// exert.
-  void OnRosWrenchMsg(const geometry_msgs::msg::Wrench::SharedPtr msg);
+  void OnRosWrenchMsg(const hrim_geometry_msgs::msg::Wrench::SharedPtr msg);
 
   /// Private data pointer
   std::unique_ptr<GazeboRosForcePrivate> impl_;
 };
-}  // namespace gazebo_plugins
+}  // namespace gazebo_hrim_plugins
 
-#endif  // GAZEBO_PLUGINS__GAZEBO_ROS_FORCE_HPP_
+#endif  // GAZEBO_HRIM_PLUGINS__GAZEBO_ROS_FORCE_HPP_

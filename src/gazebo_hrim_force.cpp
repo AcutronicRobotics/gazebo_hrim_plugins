@@ -15,16 +15,16 @@
 #include <gazebo/common/Events.hh>
 #include <gazebo/physics/Link.hh>
 #include <gazebo/physics/Model.hh>
-#include <gazebo_plugins/gazebo_ros_force.hpp>
+#include <gazebo_hrim_plugins/gazebo_hrim_force.hpp>
 #include <gazebo_ros/conversions/geometry_msgs.hpp>
 #include <gazebo_ros/node.hpp>
-#include <geometry_msgs/msg/wrench.hpp>
+#include <hrim_geometry_msgs/msg/wrench.hpp>
 #include <rclcpp/rclcpp.hpp>
 
 #include <memory>
 #include <string>
 
-namespace gazebo_plugins
+namespace gazebo_hrim_plugins
 {
 class GazeboRosForcePrivate
 {
@@ -36,10 +36,10 @@ public:
   gazebo_ros::Node::SharedPtr ros_node_;
 
   /// Wrench subscriber
-  rclcpp::Subscription<geometry_msgs::msg::Wrench>::SharedPtr wrench_sub_;
+  rclcpp::Subscription<hrim_geometry_msgs::msg::Wrench>::SharedPtr wrench_sub_;
 
   /// Container for the wrench force that this plugin exerts on the body.
-  geometry_msgs::msg::Wrench wrench_msg_;
+  hrim_geometry_msgs::msg::Wrench wrench_msg_;
 
   // Pointer to the update event connection
   gazebo::event::ConnectionPtr update_connection_;
@@ -56,7 +56,7 @@ GazeboRosForce::~GazeboRosForce()
 
 void GazeboRosForce::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf)
 {
-  auto logger = rclcpp::get_logger("gazebo_ros_force");
+  auto logger = rclcpp::get_logger("gazebo_hrim_force");
 
   // Target link
   if (!sdf->HasElement("link_name")) {
@@ -75,8 +75,8 @@ void GazeboRosForce::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf)
   // Subscribe to wrench messages
   impl_->ros_node_ = gazebo_ros::Node::Get(sdf);
 
-  impl_->wrench_sub_ = impl_->ros_node_->create_subscription<geometry_msgs::msg::Wrench>(
-    "gazebo_ros_force", std::bind(&GazeboRosForce::OnRosWrenchMsg, this,
+  impl_->wrench_sub_ = impl_->ros_node_->create_subscription<hrim_geometry_msgs::msg::Wrench>(
+    "gazebo_hrim_force", std::bind(&GazeboRosForce::OnRosWrenchMsg, this,
     std::placeholders::_1));
 
   // Callback on every iteration
@@ -84,7 +84,7 @@ void GazeboRosForce::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf)
     std::bind(&GazeboRosForce::OnUpdate, this));
 }
 
-void GazeboRosForce::OnRosWrenchMsg(const geometry_msgs::msg::Wrench::SharedPtr msg)
+void GazeboRosForce::OnRosWrenchMsg(const hrim_geometry_msgs::msg::Wrench::SharedPtr msg)
 {
   impl_->wrench_msg_.force.x = msg->force.x;
   impl_->wrench_msg_.force.y = msg->force.y;
@@ -96,9 +96,11 @@ void GazeboRosForce::OnRosWrenchMsg(const geometry_msgs::msg::Wrench::SharedPtr 
 
 void GazeboRosForce::OnUpdate()
 {
-  impl_->link_->AddForce(gazebo_ros::Convert<ignition::math::Vector3d>(impl_->wrench_msg_.force));
-  impl_->link_->AddTorque(gazebo_ros::Convert<ignition::math::Vector3d>(impl_->wrench_msg_.torque));
+  // impl_->link_->AddForce(gazebo_ros::Convert<ignition::math::Vector3d>(impl_->wrench_msg_.force));
+  impl_->link_->AddForce(ignition::math::Vector3d(impl_->wrench_msg_.force.x, impl_->wrench_msg_.force.y, impl_->wrench_msg_.force.z));
+  // impl_->link_->AddTorque(gazebo_ros::Convert<ignition::math::Vector3d>(impl_->wrench_msg_.torque));
+  impl_->link_->AddTorque(ignition::math::Vector3d(impl_->wrench_msg_.torque.x, impl_->wrench_msg_.torque.y, impl_->wrench_msg_.torque.z));
 }
 
 GZ_REGISTER_MODEL_PLUGIN(GazeboRosForce)
-}  // namespace gazebo_plugins
+}  // namespace gazebo_hrim_plugins
