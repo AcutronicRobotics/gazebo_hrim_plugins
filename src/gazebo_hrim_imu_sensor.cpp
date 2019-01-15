@@ -112,9 +112,9 @@ void GazeboRosImuSensorPrivate::OnUpdate()
   msg_->angular_velocity.y = current_velocity.Y();
   msg_->angular_velocity.z = current_velocity.Z();
 
-  msg_->linear_acceleration.x = current_velocity.X();
-  msg_->linear_acceleration.y = current_velocity.Y();
-  msg_->linear_acceleration.z = current_velocity.Z();
+  msg_->linear_acceleration.x = current_acceleration.X();
+  msg_->linear_acceleration.y = current_acceleration.Y();
+  msg_->linear_acceleration.z = current_acceleration.Z();
 
   // Publish message
   pub_->publish(msg_);
