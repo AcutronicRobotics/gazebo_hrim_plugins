@@ -23,6 +23,7 @@ find_package(hrim_sensor_imu_msgs REQUIRED)
 find_package(hrim_sensor_lidar_msgs REQUIRED)
 find_package(hrim_sensor_rangefinder_msgs REQUIRED)
 find_package(hrim_sensor_3dcameratof_msgs REQUIRED)
+find_package(hrim_sensor_forcetorque_msgs REQUIRED)
 find_package(hrim_composite_arm_msgs REQUIRED)
 find_package(hrim_composite_mobilebase_msgs REQUIRED)
 find_package(tf2 REQUIRED)
@@ -39,6 +40,7 @@ include_directories(include
   ${hrim_sensor_lidar_msgs_INCLUDE_DIRS}
   ${hrim_sensor_rangefinder_msgs_INCLUDE_DIRS}
   ${hrim_sensor_3dcameratof_msgs_INCLUDE_DIRS}
+  ${hrim_sensor_forcetorque_msgs_INCLUDE_DIRS}
   ${hrim_composite_arm_msgs_INCLUDE_DIRS}
   ${hrim_composite_mobilebase_msgs_INCLUDE_DIRS}
   ${tf2_ros_INCLUDE_DIRS}
@@ -99,6 +101,17 @@ ament_target_dependencies(gazebo_hrim_imu_sensor
 )
 ament_export_libraries(gazebo_hrim_imu_sensor)
 
+# gazebo_hrim_ft_sensor
+add_library(gazebo_hrim_ft_sensor SHARED
+  src/gazebo_hrim_ft_sensor.cpp
+)
+ament_target_dependencies(gazebo_hrim_ft_sensor
+  "gazebo_ros"
+  "hrim_sensor_forcetorque_msgs"
+  "gazebo_dev"
+)
+ament_export_libraries(gazebo_hrim_ft_sensor)
+
 # gazebo_hrim_ray_sensor
 add_library(gazebo_hrim_ray_sensor SHARED
   src/gazebo_hrim_ray_sensor.cpp
@@ -144,6 +157,7 @@ install(TARGETS
     gazebo_hrim_camera
     gazebo_hrim_force
     gazebo_hrim_imu_sensor
+    gazebo_hrim_ft_sensor
     gazebo_hrim_ray_sensor
     gazebo_hrim_joint_state_publisher
     gazebo_hrim_diff_drive
