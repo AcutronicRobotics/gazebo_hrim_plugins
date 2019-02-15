@@ -26,9 +26,26 @@
   <build_depend>gazebo_ros</build_depend>
   <build_depend>rclcpp</build_depend>
 
+  <build_depend>hrim_composite_arm_msgs</build_depend>
+  <build_depend>hrim_sensor_forcetorque_msgs</build_depend>
+  <build_depend>hrim_sensor_rangefinder_msgs</build_depend>
+  <build_depend>hrim_sensor_lidar_msgs</build_depend>
+  <build_depend>hrim_sensor_imu_msgs</build_depend>
+  <build_depend>hrim_geometry_msgs</build_depend>
+  <build_depend>hrim_sensor_camera_msgs</build_depend>
+  <build_depend>hrim_composite_mobilebase_msgs</build_depend>
+
   <exec_depend>gazebo_dev</exec_depend>
   <exec_depend>gazebo_ros</exec_depend>
   <exec_depend>rclcpp</exec_depend>
+  <exec_depend>hrim_composite_arm_msgs</exec_depend>
+  <exec_depend>hrim_sensor_forcetorque_msgs</exec_depend>
+  <exec_depend>hrim_sensor_rangefinder_msgs</exec_depend>
+  <exec_depend>gazhrim_sensor_lidar_msgsebo_dev</exec_depend>
+  <exec_depend>hrim_sensor_imu_msgs</exec_depend>
+  <exec_depend>hrim_geometry_msgs</exec_depend>
+  <exec_depend>hrim_sensor_camera_msgs</exec_depend>
+  <exec_depend>hrim_composite_mobilebase_msgs</exec_depend>
 
   <test_depend>ament_cmake_gtest</test_depend>
   <test_depend>ament_lint_auto</test_depend>
