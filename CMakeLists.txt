@@ -26,6 +26,8 @@ find_package(hrim_sensor_3dcameratof_msgs REQUIRED)
 find_package(hrim_sensor_forcetorque_msgs REQUIRED)
 find_package(hrim_composite_arm_msgs REQUIRED)
 find_package(hrim_composite_mobilebase_msgs REQUIRED)
+find_package(hrim_actuator_gripper_msgs REQUIRED)
+find_package(hrim_actuator_gripper_srvs REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
@@ -41,6 +43,8 @@ include_directories(include
   ${hrim_sensor_rangefinder_msgs_INCLUDE_DIRS}
   ${hrim_sensor_3dcameratof_msgs_INCLUDE_DIRS}
   ${hrim_sensor_forcetorque_msgs_INCLUDE_DIRS}
+  ${hrim_actuator_gripper_msgs_INCLUDE_DIRS}
+  ${hrim_actuator_gripper_srvs_INCLUDE_DIRS}
   ${hrim_composite_arm_msgs_INCLUDE_DIRS}
   ${hrim_composite_mobilebase_msgs_INCLUDE_DIRS}
   ${tf2_ros_INCLUDE_DIRS}
@@ -112,6 +116,18 @@ ament_target_dependencies(gazebo_hrim_ft_sensor
 )
 ament_export_libraries(gazebo_hrim_ft_sensor)
 
+# gazebo_hrim_vacuum_gripper
+add_library(gazebo_hrim_vacuum_gripper SHARED
+  src/gazebo_hrim_vacuum_gripper.cpp
+)
+ament_target_dependencies(gazebo_hrim_vacuum_gripper
+  "gazebo_ros"
+  "hrim_actuator_gripper_msgs"
+  "hrim_actuator_gripper_srvs"
+  "gazebo_dev"
+)
+ament_export_libraries(gazebo_hrim_vacuum_gripper)
+
 # gazebo_hrim_ray_sensor
 add_library(gazebo_hrim_ray_sensor SHARED
   src/gazebo_hrim_ray_sensor.cpp
@@ -158,6 +174,7 @@ install(TARGETS
     gazebo_hrim_force
     gazebo_hrim_imu_sensor
     gazebo_hrim_ft_sensor
+    gazebo_hrim_vacuum_gripper
     gazebo_hrim_ray_sensor
     gazebo_hrim_joint_state_publisher
     gazebo_hrim_diff_drive
