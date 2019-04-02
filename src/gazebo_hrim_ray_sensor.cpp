@@ -36,18 +36,23 @@ public:
   gazebo::event::ConnectionPtr sensor_update_event_;
 
   rclcpp::Publisher<hrim_sensor_lidar_msgs::msg::LidarScan>::SharedPtr laser_pub_;
-  rclcpp::Publisher<hrim_sensor_rangefinder_msgs::msg::SpecsRangefinder>::SharedPtr range_specs_pub_;
+  rclcpp::Service<hrim_sensor_rangefinder_srvs::srv::SpecsRangefinder>::SharedPtr range_specs_srv_;
   rclcpp::Publisher<hrim_sensor_rangefinder_msgs::msg::Distance>::SharedPtr range_pub_;
   rclcpp::Publisher<hrim_sensor_3dcameratof_msgs::msg::PointCloud>::SharedPtr cloud_pub_;
 
+  std::shared_ptr<hrim_sensor_rangefinder_srvs::srv::SpecsRangefinder::Response> range_specs_response_;
+
   std::string frame_name_;
-  uint8_t range_radiation_type_;
 
   rclcpp::Time last_measure_time_;
   rclcpp::Time last_update_time_;
 
   void OnUpdate();
   void ConvertCloud(const hrim_sensor_3dcameratof_msgs::msg::PointCloud::SharedPtr & pointCloud, double min_intensity);
+
+  void OnSpecsCall(const std::shared_ptr<rmw_request_id_t> request_header,
+    const std::shared_ptr<hrim_sensor_rangefinder_srvs::srv::SpecsRangefinder::Request> request,
+    const std::shared_ptr<hrim_sensor_rangefinder_srvs::srv::SpecsRangefinder::Response> response);
 };
 
 GazeboRosRaySensor::GazeboRosRaySensor()
@@ -71,7 +76,6 @@ void GazeboRosRaySensor::Load(gazebo::sensors::SensorPtr _sensor, sdf::ElementPt
   }
 
   impl_->laser_pub_ = impl_->ros_node_->create_publisher<hrim_sensor_lidar_msgs::msg::LidarScan>("~/outlaser");
-  impl_->range_specs_pub_ = impl_->ros_node_->create_publisher<hrim_sensor_rangefinder_msgs::msg::SpecsRangefinder>("~/outspecs");
   impl_->range_pub_ = impl_->ros_node_->create_publisher<hrim_sensor_rangefinder_msgs::msg::Distance>("~/outrange");
   impl_->cloud_pub_ = impl_->ros_node_->create_publisher<hrim_sensor_3dcameratof_msgs::msg::PointCloud>("~/outcloud");
 
@@ -82,14 +86,16 @@ void GazeboRosRaySensor::Load(gazebo::sensors::SensorPtr _sensor, sdf::ElementPt
 
   impl_->last_update_time_ = impl_->last_measure_time_ = rclcpp::Time();
 
+  uint range_radiation_type_;
+
   if (!_sdf->HasElement("radiation_type")) {
     RCLCPP_INFO(impl_->ros_node_->get_logger(),
       "missing <radiation_type>, defaulting to infrared");
-    impl_->range_radiation_type_ = hrim_sensor_rangefinder_msgs::msg::SpecsRangefinder::INFRARED;
+    range_radiation_type_ = hrim_sensor_rangefinder_srvs::srv::SpecsRangefinder::Response::INFRARED;
   } else if ("ultrasound" == _sdf->Get<std::string>("radiation_type")) {
-    impl_->range_radiation_type_ = hrim_sensor_rangefinder_msgs::msg::SpecsRangefinder::ULTRASOUND;
+    range_radiation_type_ = hrim_sensor_rangefinder_srvs::srv::SpecsRangefinder::Response::ULTRASOUND;
   } else if ("infrared" == _sdf->Get<std::string>("radiation_type")) {
-    impl_->range_radiation_type_ = hrim_sensor_rangefinder_msgs::msg::SpecsRangefinder::INFRARED;
+    range_radiation_type_ = hrim_sensor_rangefinder_srvs::srv::SpecsRangefinder::Response::INFRARED;
   } else {
     RCLCPP_ERROR(
       impl_->ros_node_->get_logger(),
@@ -98,13 +104,42 @@ void GazeboRosRaySensor::Load(gazebo::sensors::SensorPtr _sensor, sdf::ElementPt
     return;
   }
 
+  impl_->range_specs_srv_ = impl_->ros_node_->create_service<hrim_sensor_rangefinder_srvs::srv::SpecsRangefinder>(
+    "~/outspecs", std::bind(&GazeboRosRaySensorPrivate::OnSpecsCall, impl_.get(),
+    std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+
+  impl_->range_specs_response_->min_range = impl_->sensor_->RangeMin();
+  impl_->range_specs_response_->max_range = impl_->sensor_->RangeMax();
+  impl_->range_specs_response_->radiation_type = range_radiation_type_;
+  impl_->range_specs_response_->accuracy = impl_->sensor_->RangeResolution();
+
+  auto horizontal_fov = impl_->sensor_->AngleMax() - impl_->sensor_->AngleMin();
+  auto vertical_fov = impl_->sensor_->VerticalAngleMax() - impl_->sensor_->VerticalAngleMin();
+  impl_->range_specs_response_->field_of_view = std::max(horizontal_fov, vertical_fov).Radian();
+
+
+}
+
+// Gripper control service handler
+void GazeboRosRaySensorPrivate::OnSpecsCall(
+  const std::shared_ptr<rmw_request_id_t> request_header,
+  const std::shared_ptr<hrim_sensor_rangefinder_srvs::srv::SpecsRangefinder::Request> request,
+  const std::shared_ptr<hrim_sensor_rangefinder_srvs::srv::SpecsRangefinder::Response> response)
+{
+  (void)request_header;
+
+  response->radiation_type = range_specs_response_->radiation_type;
+  response->field_of_view = range_specs_response_->field_of_view;
+  response->min_range = range_specs_response_->min_range;
+  response->max_range = range_specs_response_->max_range;
+  response->accuracy = range_specs_response_->accuracy;
+
 }
 
 void GazeboRosRaySensorPrivate::OnUpdate()
 {
 
     hrim_sensor_lidar_msgs::msg::LidarScan::SharedPtr laser_msg_ = std::make_shared<hrim_sensor_lidar_msgs::msg::LidarScan>();
-    hrim_sensor_rangefinder_msgs::msg::SpecsRangefinder::SharedPtr range_specs_msg_ = std::make_shared<hrim_sensor_rangefinder_msgs::msg::SpecsRangefinder>();
     hrim_sensor_rangefinder_msgs::msg::Distance::SharedPtr range_msg_ = std::make_shared<hrim_sensor_rangefinder_msgs::msg::Distance>();
     hrim_sensor_3dcameratof_msgs::msg::PointCloud::SharedPtr cloud_msg_ = std::make_shared<hrim_sensor_3dcameratof_msgs::msg::PointCloud>();
 
@@ -113,9 +148,9 @@ void GazeboRosRaySensorPrivate::OnUpdate()
 
     auto sensor_time = sensor_->LastUpdateTime();
 
-    cloud_msg_->header.frame_id = range_specs_msg_->header.frame_id = range_msg_->header.frame_id = laser_msg_->header.frame_id = frame_name_;
-    cloud_msg_->header.stamp.sec = range_specs_msg_->header.stamp.sec = range_msg_->header.stamp.sec = laser_msg_->header.stamp.sec = int(sensor_time.sec);
-    cloud_msg_->header.stamp.nanosec = range_specs_msg_->header.stamp.nanosec = range_msg_->header.stamp.nanosec = laser_msg_->header.stamp.nanosec = int(sensor_time.nsec);
+    cloud_msg_->header.frame_id = range_msg_->header.frame_id = laser_msg_->header.frame_id = frame_name_;
+    cloud_msg_->header.stamp.sec = range_msg_->header.stamp.sec = laser_msg_->header.stamp.sec = int(sensor_time.sec);
+    cloud_msg_->header.stamp.nanosec = range_msg_->header.stamp.nanosec = laser_msg_->header.stamp.nanosec = int(sensor_time.nsec);
 
     range_msg_->time_measurements = laser_msg_->time_increment = (prev_meas_ - last_measure_time_).seconds();
     laser_msg_->time_scan = (prev_upd_ - last_update_time_).seconds();
@@ -123,8 +158,8 @@ void GazeboRosRaySensorPrivate::OnUpdate()
     laser_msg_->angle_start = sensor_->AngleMin().Radian();
     laser_msg_->angle_end = sensor_->AngleMax().Radian();
     laser_msg_->angle_increment = sensor_->AngleResolution();
-    range_specs_msg_->min_range = range_msg_->range_min = laser_msg_->range_min = sensor_->RangeMin();
-    range_specs_msg_->max_range = range_msg_->range_max = laser_msg_->range_max = sensor_->RangeMax();
+    range_msg_->range_min = laser_msg_->range_min = sensor_->RangeMin();
+    range_msg_->range_max = laser_msg_->range_max = sensor_->RangeMax();
 
     std::vector<double> tmpRanges;
     sensor_->Ranges(tmpRanges);
@@ -143,17 +178,9 @@ void GazeboRosRaySensorPrivate::OnUpdate()
 
     range_msg_->distance = tmpRange;
 
-    range_specs_msg_->radiation_type = range_radiation_type_;
-    range_specs_msg_->accuracy = sensor_->RangeResolution();
-  
-    auto horizontal_fov = sensor_->AngleMax() - sensor_->AngleMin();
-    auto vertical_fov = sensor_->VerticalAngleMax() - sensor_->VerticalAngleMin();
-    range_specs_msg_->field_of_view = std::max(horizontal_fov, vertical_fov).Radian();
-  
     GazeboRosRaySensorPrivate::ConvertCloud(cloud_msg_, 0.0);
 
     laser_pub_->publish(laser_msg_);
-    range_specs_pub_->publish(range_specs_msg_);
     range_pub_->publish(range_msg_);
     cloud_pub_->publish(cloud_msg_);
 
