@@ -108,6 +108,7 @@ void GazeboRosRaySensor::Load(gazebo::sensors::SensorPtr _sensor, sdf::ElementPt
     "~/outspecs", std::bind(&GazeboRosRaySensorPrivate::OnSpecsCall, impl_.get(),
     std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
+  impl_->range_specs_response_ = std::make_shared<hrim_sensor_rangefinder_srvs::srv::SpecsRangefinder::Response>();
   impl_->range_specs_response_->min_range = impl_->sensor_->RangeMin();
   impl_->range_specs_response_->max_range = impl_->sensor_->RangeMax();
   impl_->range_specs_response_->radiation_type = range_radiation_type_;
